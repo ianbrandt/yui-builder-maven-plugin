@@ -20,28 +20,38 @@ import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Goal which executes a YUI Build Tool component build.
- *
- * @goal build
- *
- * @phase compile
  */
+@Mojo(name = "build", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class BuildMojo extends AbstractMojo {
 
+	@Component
+	private BuildContext buildContext;
+
 	/**
-	 * Location of the file.
-	 *
-	 * @parameter expression="${project.build.directory}/generated-sources/yui"
-	 * @required
+	 * Source directory containing YUI modules (i.e. <code>${srcdir}/src</code>).
 	 */
-	private File outputDirectory;
+	@Parameter(defaultValue="${basedir}/src/main/yui", required=true)
+	private File sourceDirectory;
+
+	/**
+	 * Build directory where YUI modules are deployed to by the component build
+	 * (i.e. the <code>${global.build.base}</code>).
+	 */
+	@Parameter(defaultValue="${project.build.directory}/generated-sources/yui", required=true)
+	private File buildDirectory;
 
 	public void execute() throws MojoExecutionException {
 
-		if (!outputDirectory.exists()) {
-			outputDirectory.mkdirs();
+		if (!buildDirectory.exists()) {
+			buildDirectory.mkdirs();
 		}
 	}
 }
